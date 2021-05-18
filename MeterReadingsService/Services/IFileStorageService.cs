@@ -7,6 +7,6 @@ namespace MeterReadingsService.Services
     {
         public Task<string> Store(IFormFile file);
 
-        public Task Delete(string filePath);
+        public void Delete(string filePath);
     }
 }

@@ -32,7 +32,7 @@ namespace MeterReadingsService.Controllers
             }
             finally
             {
-                await _fileStorageService.Delete(tempFilePath);
+                _fileStorageService.Delete(tempFilePath);
             }
 
 

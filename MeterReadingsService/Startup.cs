@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using MeterReadingsService.Services;
@@ -33,7 +34,9 @@ namespace MeterReadingsService
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MeterReadingsService", Version = "v1" });
             });
-            services.AddSingleton<IFileStorageService, FileStorageService>();
+            services.AddScoped<IFileStorageService, FileStorageService>();
+            services.AddScoped<IFileSystem, FileSystem>();
+            services.AddTransient<IGuidGenerator, GuidGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
