@@ -8,6 +8,10 @@ namespace MeterReadingsService.Services
     {
         public Task<string> Store(IFormFile file)
         {
+            if (file == null)
+            {
+                throw new ArgumentNullException("a file must be provided");
+            }
             throw new NotImplementedException();
         }
 
