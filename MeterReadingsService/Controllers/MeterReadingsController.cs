@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
+using MeterReadingsService.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeterReadingsService.Controllers
@@ -7,13 +9,32 @@ namespace MeterReadingsService.Controllers
     [Route("api")]
     public class MeterReadingsController : ControllerBase
     {
+        private readonly IFileStorageService _fileStorageService;
+
+        public MeterReadingsController(IFileStorageService fileStorageService)
+        {
+            _fileStorageService = fileStorageService;
+        }
+
         [HttpPost("meter-reading-uploads")]
-        public IActionResult Upload(IFormFile file)
+        public async Task<IActionResult> Upload(IFormFile file)
         {
             if (!IsCsv(file))
             {
                 return BadRequest("csv file required");
             }
+
+            var tempFilePath = await _fileStorageService.Store(file);
+
+            try
+            {
+
+            }
+            finally
+            {
+                await _fileStorageService.Delete(tempFilePath);
+            }
+
 
             return Ok();
         }
