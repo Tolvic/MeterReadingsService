@@ -1,4 +1,6 @@
-﻿namespace MeterReadingsService.Validator
+﻿using System.Dynamic;
+
+namespace MeterReadingsService.Validator
 {
     public interface IMeterReadingUploadsValidator
     {

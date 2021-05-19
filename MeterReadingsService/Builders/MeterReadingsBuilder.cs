@@ -38,9 +38,9 @@ namespace MeterReadingsService.Builders
                 {
                     var meterReading = new MeterReading
                     {
-                        AccountId = (int)row.AccountId,
-                        MeterReadingDateTime = (DateTime)row.MeterReadingDateTime,
-                        MeterReadValue = (int)row.MeterReadValue
+                        AccountId = int.Parse(row.AccountId),
+                        MeterReadingDateTime = DateTime.Parse(row.MeterReadingDateTime),
+                        MeterReadValue = int.Parse(row.MeterReadValue)
                     };
 
                     meterReadings.Add(meterReading);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using FluentAssertions;
 using MeterReadingsService.Builders;
 using MeterReadingsService.Models;
@@ -69,18 +70,17 @@ namespace MeterReadingsService.UnitTests.Builders
         public void Build_GivenValidCsvRows_ShouldReturnExpectedResultsWhenAllRowsAreValid()
         {
             // arrange 
-            var readingOne = new MeterReading
-            {
-                AccountId = 1,
-                MeterReadValue = 12345,
-                MeterReadingDateTime = DateTime.Now
-            };
-            var readingTwo = new MeterReading
-            {
-                AccountId = 2,
-                MeterReadValue = 12345,
-                MeterReadingDateTime = DateTime.Now
-            };
+            var dateTime = new DateTime(2021, 05, 19, 16, 42, 00);
+
+            dynamic readingOne = new ExpandoObject();
+            readingOne.AccountId = "1";
+            readingOne.MeterReadValue = "12345";
+            readingOne.MeterReadingDateTime = dateTime.ToString();
+
+            dynamic readingTwo = new ExpandoObject();
+            readingTwo.AccountId = "2";
+            readingTwo.MeterReadValue = "12345";
+            readingTwo.MeterReadingDateTime = dateTime.ToString();
 
             var csvRows = new List<dynamic>
             {
@@ -90,11 +90,21 @@ namespace MeterReadingsService.UnitTests.Builders
 
             var expectedResult = new List<MeterReading>
             {
-                readingOne,
-                readingTwo
+                new MeterReading
+                {
+                    AccountId = 1,
+                    MeterReadValue = 12345,
+                    MeterReadingDateTime = dateTime
+                },
+                new  MeterReading
+                {
+                    AccountId = 2,
+                    MeterReadValue = 12345,
+                    MeterReadingDateTime = dateTime
+                }
             };
 
-            _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<object>())).Returns(true);
+            _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<ExpandoObject>())).Returns(true);
 
             // act
             var actualResult = _meterReadingsBuilder.Build(csvRows);
@@ -128,12 +138,13 @@ namespace MeterReadingsService.UnitTests.Builders
         public void Build_GivenValidCsvRows_ShouldReturnExpectedResultsWhenThereIsAMixOFValidAndInValidRows()
         {
             // arrange 
-            var validReading = new MeterReading
-            {
-                AccountId = 1,
-                MeterReadValue = 12345,
-                MeterReadingDateTime = DateTime.Now
-            };
+            var dateTime = new DateTime(2021, 05, 19, 16, 42, 00);
+
+            dynamic validReading = new ExpandoObject();
+            validReading.AccountId = "1";
+            validReading.MeterReadValue = "12345";
+            validReading.MeterReadingDateTime = dateTime.ToString();
+
 
             var csvRows = new List<dynamic>
             {
@@ -141,13 +152,19 @@ namespace MeterReadingsService.UnitTests.Builders
                 new object()
             };
 
+
             var expectedResult = new List<MeterReading>
             {
-                validReading
+                new MeterReading
+                {
+                    AccountId = 1,
+                    MeterReadValue = 12345,
+                    MeterReadingDateTime = dateTime
+                }
             };
 
             _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<object>())).Returns(false);
-            _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<MeterReading>())).Returns(true);
+            _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<ExpandoObject>())).Returns(true);
 
             // act
             var actualResult = _meterReadingsBuilder.Build(csvRows);
@@ -160,26 +177,22 @@ namespace MeterReadingsService.UnitTests.Builders
         public void Build_GivenDuplicateReadings_ShouldNotIncludedDuplicateResults()
         {
             // arrange 
-            var duplicatedReading = new MeterReading
-            {
-                AccountId = 1,
-                MeterReadValue = 12345,
-                MeterReadingDateTime = DateTime.Now
-            };
+            var dateTime = new DateTime(2021, 05, 19, 16, 42, 00);
 
-            var readingForSameAccountWithDifferentValue = new MeterReading
-            {
-                AccountId = 1,
-                MeterReadValue = 98765,
-                MeterReadingDateTime = DateTime.Now
-            };
+            dynamic duplicatedReading = new ExpandoObject();
+            duplicatedReading.AccountId = "1";
+            duplicatedReading.MeterReadValue = "12345";
+            duplicatedReading.MeterReadingDateTime = dateTime.ToString();
 
-            var readingForDifferentAccount = new MeterReading
-            {
-                AccountId = 99,
-                MeterReadValue = 12345,
-                MeterReadingDateTime = DateTime.Now
-            };
+            dynamic readingForSameAccountWithDifferentValue = new ExpandoObject();
+            readingForSameAccountWithDifferentValue.AccountId = "1";
+            readingForSameAccountWithDifferentValue.MeterReadValue = "98765";
+            readingForSameAccountWithDifferentValue.MeterReadingDateTime = dateTime.ToString();
+
+            dynamic readingForDifferentAccount = new ExpandoObject();
+            readingForDifferentAccount.AccountId = "2";
+            readingForDifferentAccount.MeterReadValue = "12345";
+            readingForDifferentAccount.MeterReadingDateTime = dateTime.ToString();
 
             var csvRows = new List<dynamic>
             {
@@ -191,12 +204,27 @@ namespace MeterReadingsService.UnitTests.Builders
 
             var expectedResult = new List<MeterReading>
             {
-                duplicatedReading,
-                readingForSameAccountWithDifferentValue,
-                readingForDifferentAccount
+                new MeterReading
+                {
+                    AccountId = 1,
+                    MeterReadValue = 12345,
+                    MeterReadingDateTime = dateTime
+                },
+                new  MeterReading
+                {
+                    AccountId = 1,
+                    MeterReadValue = 98765,
+                    MeterReadingDateTime = dateTime
+                },
+                new  MeterReading
+                {
+                    AccountId = 2,
+                    MeterReadValue = 12345,
+                    MeterReadingDateTime = dateTime
+                },
             };
 
-            _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<MeterReading>())).Returns(true);
+            _mockMeterReadingsValidator.Setup(x => x.IsValid(It.IsAny<ExpandoObject>())).Returns(true);
 
             // act
             var actualResult = _meterReadingsBuilder.Build(csvRows);
