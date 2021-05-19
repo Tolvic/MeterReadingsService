@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using System.IO.Abstractions;
 using MeterReadingsService.Builders;
 using MeterReadingsService.Services;
+using MeterReadingsService.Validator;
 
 namespace MeterReadingsService
 {
@@ -33,7 +34,8 @@ namespace MeterReadingsService
             services.AddTransient<IGuidGenerator, GuidGenerator>();
             services.AddTransient<ICsvReaderBuilder, CsvReaderBuilder>();
             services.AddScoped<ICsvParser, CsvParser>();
-            services.AddTransient<IMeterReadingsBuilder, MeterReadingsBuilder>()
+            services.AddTransient<IMeterReadingsBuilder, MeterReadingsBuilder>();
+            services.AddTransient<IMeterReadingUploadsValidator, MeterReadingUploadsValidator>();
 
 
         }
