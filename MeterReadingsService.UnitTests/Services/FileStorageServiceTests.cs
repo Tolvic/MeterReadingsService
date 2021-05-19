@@ -211,7 +211,6 @@ namespace MeterReadingsService.UnitTests.Services
             var filePath = "c\\temp\filename.csv";
             _mockFileSystem.Setup(x => x.File.Exists(filePath)).Returns(false);
 
-
             // act
             _fileStorageService.Delete(filePath);
 

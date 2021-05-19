@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Threading.Tasks;
+using MeterReadingsService.Builders;
 using MeterReadingsService.Services;
 
 namespace MeterReadingsService
@@ -37,6 +31,10 @@ namespace MeterReadingsService
             services.AddScoped<IFileStorageService, FileStorageService>();
             services.AddScoped<IFileSystem, FileSystem>();
             services.AddTransient<IGuidGenerator, GuidGenerator>();
+            services.AddTransient<ICsvReaderBuilder, CsvReaderBuilder>();
+            services.AddScoped<ICsvParser, CsvParser>();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
