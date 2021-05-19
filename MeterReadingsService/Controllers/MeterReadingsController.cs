@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MeterReadingsService.Builders;
+using MeterReadingsService.Models;
 using MeterReadingsService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +15,14 @@ namespace MeterReadingsService.Controllers
         private readonly IFileStorageService _fileStorageService;
         private readonly ICsvParser _csvParser;
         private readonly IMeterReadingsBuilder _meterReadingsBuilder;
+        private readonly IUploadResultBuilder _uploadResultBuilder;
 
-        public MeterReadingsController(IFileStorageService fileStorageService, ICsvParser csvParser, IMeterReadingsBuilder meterReadingsBuilder)
+        public MeterReadingsController(IFileStorageService fileStorageService, ICsvParser csvParser, IMeterReadingsBuilder meterReadingsBuilder, IUploadResultBuilder uploadResultBuilder)
         {
             _fileStorageService = fileStorageService;
             _csvParser = csvParser;
             _meterReadingsBuilder = meterReadingsBuilder;
+            _uploadResultBuilder = uploadResultBuilder;
         }
 
         [HttpPost("meter-reading-uploads")]
@@ -31,10 +35,13 @@ namespace MeterReadingsService.Controllers
 
             var tempFilePath = await _fileStorageService.Store(file);
 
+            List<dynamic> csvRecords;
+            List<MeterReading> meterReadings;
+
             try
             {
-                var csvRecords = _csvParser.Parse(tempFilePath);
-                var meterReadings = _meterReadingsBuilder.Build(csvRecords);
+                csvRecords = _csvParser.Parse(tempFilePath);
+                meterReadings = _meterReadingsBuilder.Build(csvRecords);
             }
             catch
             {
@@ -45,8 +52,9 @@ namespace MeterReadingsService.Controllers
                 _fileStorageService.Delete(tempFilePath);
             }
 
+            var uploadResult = _uploadResultBuilder.Build(meterReadings, csvRecords);
 
-            return Ok();
+            return Ok(uploadResult);
         }
 
         private bool IsCsv(IFormFile file)

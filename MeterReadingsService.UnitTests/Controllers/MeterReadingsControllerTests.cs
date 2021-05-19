@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MeterReadingsService.Builders;
 using MeterReadingsService.Controllers;
+using MeterReadingsService.Models;
 using MeterReadingsService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +19,14 @@ namespace MeterReadingsService.UnitTests.Controllers
     class MeterReadingsControllerTests
     {
         private const string DummyFilePath = "c:\\Temp\\Dummy.csv";
-        private readonly List<dynamic> DummyCsvRows = new List<dynamic>();
+        private readonly List<dynamic> _dummyCsvRows = new List<dynamic>();
+        private readonly List<MeterReading> _dummyMeterReadings = new List<MeterReading>();
         private readonly FormFile _dummyCsvFile; 
         private Mock<IFileStorageService> _mockFileStorageService;
         private Mock<ICsvParser> _mockCsvParser;
         private MeterReadingsController _controller;
         private Mock<IMeterReadingsBuilder> _mockMeterReadingsBuilder;
+        private Mock<IUploadResultBuilder> _mockUploadResultBuilder;
 
         public MeterReadingsControllerTests()
         {
@@ -36,7 +39,8 @@ namespace MeterReadingsService.UnitTests.Controllers
             _mockFileStorageService = new Mock<IFileStorageService>();
             _mockCsvParser = new Mock<ICsvParser>();
             _mockMeterReadingsBuilder = new Mock<IMeterReadingsBuilder>();
-            _controller = new MeterReadingsController(_mockFileStorageService.Object, _mockCsvParser.Object, _mockMeterReadingsBuilder.Object);
+            _mockUploadResultBuilder = new Mock<IUploadResultBuilder>();
+            _controller = new MeterReadingsController(_mockFileStorageService.Object, _mockCsvParser.Object, _mockMeterReadingsBuilder.Object, _mockUploadResultBuilder.Object);
         }
 
         [Test]
@@ -200,7 +204,7 @@ namespace MeterReadingsService.UnitTests.Controllers
             _ = _controller.Upload(_dummyCsvFile);
 
             // assert
-            _mockMeterReadingsBuilder.Verify((x => x.Build(DummyCsvRows)), Times.Once());
+            _mockMeterReadingsBuilder.Verify((x => x.Build(_dummyCsvRows)), Times.Once());
         }
 
         [Test]
@@ -208,7 +212,7 @@ namespace MeterReadingsService.UnitTests.Controllers
         {
             // arrange
             InitDefaultMocking();
-            _mockMeterReadingsBuilder.Setup(x => x.Build(DummyCsvRows)).Throws(new Exception());
+            _mockMeterReadingsBuilder.Setup(x => x.Build(_dummyCsvRows)).Throws(new Exception());
 
             // act
             _ = _controller.Upload(_dummyCsvFile);
@@ -222,7 +226,7 @@ namespace MeterReadingsService.UnitTests.Controllers
         {
             // arrange
             InitDefaultMocking();
-            _mockMeterReadingsBuilder.Setup(x => x.Build(DummyCsvRows)).Throws(new Exception());
+            _mockMeterReadingsBuilder.Setup(x => x.Build(_dummyCsvRows)).Throws(new Exception());
 
             // act
             var result = await _controller.Upload(_dummyCsvFile);
@@ -232,17 +236,34 @@ namespace MeterReadingsService.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Upload_GivenACsvFile_ShouldReturnOkResult()
+        public async Task Upload_GivenACsvFile_ShouldCallUploadResultBuilder()
         {
             // arrange
+            InitDefaultMocking();
 
             // act
-            var result = await _controller.Upload(_dummyCsvFile);
+            _ = await _controller.Upload(_dummyCsvFile);
 
             // assert
-            result.Should().BeOfType<OkResult>();
+            _mockUploadResultBuilder.Verify(x => x.Build(_dummyMeterReadings, _dummyCsvRows));
         }
+        
+        [Test]
+        public async Task Upload_GivenACsvFile_ShouldReturnOkResultWithUploadResultasValue()
+        {
+            // arrange
+            InitDefaultMocking();
+            var uploadResult = new UploadResult();
+            _mockUploadResultBuilder.Setup(x => x.Build(_dummyMeterReadings, _dummyCsvRows)).Returns(uploadResult);
 
+            // act
+            var result = await _controller.Upload(_dummyCsvFile) as OkObjectResult;
+
+
+            // assert
+            result!.Value.Should().BeEquivalentTo(uploadResult);
+        }
+        
         private FormFile GetDummyCsvFile()
         {
             return new FormFile(new MemoryStream(Encoding.UTF8.GetBytes("This is a dummy file")), 0, 0, "Data", "dummy.csv");
@@ -252,7 +273,9 @@ namespace MeterReadingsService.UnitTests.Controllers
         {
             _mockFileStorageService.Setup(x => x.Store(_dummyCsvFile)).ReturnsAsync(DummyFilePath);
             
-            _mockCsvParser.Setup(x => x.Parse(DummyFilePath)).Returns(DummyCsvRows);
+            _mockCsvParser.Setup(x => x.Parse(DummyFilePath)).Returns(_dummyCsvRows);
+
+            _mockMeterReadingsBuilder.Setup(x => x.Build(_dummyCsvRows)).Returns(_dummyMeterReadings);
         }
     }
 }
