@@ -6,8 +6,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.IO.Abstractions;
 using MeterReadingsService.Builders;
+using MeterReadingsService.Data;
 using MeterReadingsService.Services;
 using MeterReadingsService.Validator;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeterReadingsService
 {
@@ -25,6 +27,9 @@ namespace MeterReadingsService
         {
 
             services.AddControllers();
+            services.AddDbContext <MeterReadingServiceContext> (options =>
+                options.UseSqlServer(Configuration.GetConnectionString("MeterReadingServiceContext")));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MeterReadingsService", Version = "v1" });
