@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using FluentAssertions;
 using MeterReadingsService.Builders;
@@ -10,6 +11,7 @@ using NUnit.Framework;
 
 namespace MeterReadingsService.UnitTests.Builders
 {
+    [ExcludeFromCodeCoverage]
     class MeterReadingsBuilderTests
     {
         private Mock<IMeterReadingUploadsValidator> _mockMeterReadingsValidator;

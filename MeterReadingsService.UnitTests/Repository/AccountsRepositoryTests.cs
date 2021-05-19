@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MeterReadingsService.Data;
 using MeterReadingsService.Models;
@@ -10,6 +11,7 @@ using FluentAssertions;
 
 namespace MeterReadingsService.UnitTests.Repository
 {
+    [ExcludeFromCodeCoverage]
     class AccountsRepositoryTests
     {
         private MeterReadingServiceContext _context;

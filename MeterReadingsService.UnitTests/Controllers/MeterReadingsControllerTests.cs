@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ using NUnit.Framework;
 
 namespace MeterReadingsService.UnitTests.Controllers
 {
+    [ExcludeFromCodeCoverage]
     class MeterReadingsControllerTests
     {
         private const string DummyFilePath = "c:\\Temp\\Dummy.csv";

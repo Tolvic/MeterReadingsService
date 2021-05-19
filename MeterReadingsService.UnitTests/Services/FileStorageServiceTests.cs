@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using NUnit.Framework;
 
 namespace MeterReadingsService.UnitTests.Services
 {
+    [ExcludeFromCodeCoverage]
     class FileStorageServiceTests
     {
         private FileStorageService _fileStorageService;

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Text;
 using CsvHelper;
 using FluentAssertions;
@@ -7,6 +8,7 @@ using NUnit.Framework;
 
 namespace MeterReadingsService.UnitTests.Builders
 {
+    [ExcludeFromCodeCoverage]
     class CsvReaderBuilderTests
     {
         [Test]

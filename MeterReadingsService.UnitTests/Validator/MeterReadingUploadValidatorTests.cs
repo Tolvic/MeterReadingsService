@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using MeterReadingsService.Validator;
 using NUnit.Framework;
@@ -8,6 +9,7 @@ using Moq;
 
 namespace MeterReadingsService.UnitTests.Validator
 {
+    [ExcludeFromCodeCoverage]
     class MeterReadingUploadValidatorTests
     {
         private MeterReadingUploadsValidator _validator;

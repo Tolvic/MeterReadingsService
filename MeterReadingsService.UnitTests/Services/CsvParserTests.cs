@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.Text;
@@ -12,6 +13,7 @@ using CsvParser = MeterReadingsService.Services.CsvParser;
 
 namespace MeterReadingsService.UnitTests.Services
 {
+    [ExcludeFromCodeCoverage]
     class CsvParserTests
     {
         private CsvParser _csvParser;
