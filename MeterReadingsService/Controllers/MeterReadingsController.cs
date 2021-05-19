@@ -10,10 +10,12 @@ namespace MeterReadingsService.Controllers
     public class MeterReadingsController : ControllerBase
     {
         private readonly IFileStorageService _fileStorageService;
+        private readonly ICsvParser _csvParser;
 
-        public MeterReadingsController(IFileStorageService fileStorageService)
+        public MeterReadingsController(IFileStorageService fileStorageService, ICsvParser csvParser)
         {
             _fileStorageService = fileStorageService;
+            _csvParser = csvParser;
         }
 
         [HttpPost("meter-reading-uploads")]
@@ -28,7 +30,11 @@ namespace MeterReadingsService.Controllers
 
             try
             {
-
+                var csvRecords = _csvParser.Parse(tempFilePath);
+            }
+            catch
+            {
+                return StatusCode(500);
             }
             finally
             {
