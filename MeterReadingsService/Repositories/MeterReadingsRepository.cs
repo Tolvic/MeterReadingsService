@@ -4,7 +4,7 @@ using MeterReadingsService.Models;
 
 namespace MeterReadingsService.Repositories
 {
-    public class MeterReadingsRepository
+    public class MeterReadingsRepository : IMeterReadingsRepository
     {
         private readonly MeterReadingServiceContext _context;
 

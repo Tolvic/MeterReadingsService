@@ -8,6 +8,7 @@ using FluentAssertions;
 using MeterReadingsService.Builders;
 using MeterReadingsService.Controllers;
 using MeterReadingsService.Models;
+using MeterReadingsService.Repositories;
 using MeterReadingsService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ namespace MeterReadingsService.UnitTests.Controllers
         private MeterReadingsController _controller;
         private Mock<IMeterReadingsBuilder> _mockMeterReadingsBuilder;
         private Mock<IUploadResultBuilder> _mockUploadResultBuilder;
+        private Mock<IMeterReadingsRepository> _mockMeterReadingsRepository;
 
         public MeterReadingsControllerTests()
         {
@@ -40,7 +42,8 @@ namespace MeterReadingsService.UnitTests.Controllers
             _mockCsvParser = new Mock<ICsvParser>();
             _mockMeterReadingsBuilder = new Mock<IMeterReadingsBuilder>();
             _mockUploadResultBuilder = new Mock<IUploadResultBuilder>();
-            _controller = new MeterReadingsController(_mockFileStorageService.Object, _mockCsvParser.Object, _mockMeterReadingsBuilder.Object, _mockUploadResultBuilder.Object);
+            _mockMeterReadingsRepository = new Mock<IMeterReadingsRepository>();
+            _controller = new MeterReadingsController(_mockFileStorageService.Object, _mockCsvParser.Object, _mockMeterReadingsBuilder.Object, _mockUploadResultBuilder.Object, _mockMeterReadingsRepository.Object);
         }
 
         [Test]
@@ -227,6 +230,47 @@ namespace MeterReadingsService.UnitTests.Controllers
             // arrange
             InitDefaultMocking();
             _mockMeterReadingsBuilder.Setup(x => x.Build(_dummyCsvRows)).Throws(new Exception());
+
+            // act
+            var result = await _controller.Upload(_dummyCsvFile);
+
+            // assert
+            result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(500);
+        }
+
+        [Test]
+        public void Upload_GivenACsvFile_ShouldCallMeterReadingsRepositoryAddRange()
+        {
+            // arrange
+            InitDefaultMocking();
+
+            // act
+            _ = _controller.Upload(_dummyCsvFile);
+
+            // assert
+            _mockMeterReadingsRepository.Verify(x => x.AddRange(_dummyMeterReadings));
+        }
+
+        [Test]
+        public void Upload_GivenMMeterReadingsRepositoryThrowsException_ShouldCallMeterReadingsBuilderBuild()
+        {
+            // arrange
+            InitDefaultMocking();
+            _mockMeterReadingsRepository.Setup(x => x.AddRange(_dummyMeterReadings)).Throws(new Exception());
+
+            // act
+            _ = _controller.Upload(_dummyCsvFile);
+
+            // assert
+            _mockFileStorageService.Verify((x => x.Delete(DummyFilePath)), Times.Once());
+        }
+
+        [Test]
+        public async Task Upload_GivenMMeterReadingsRepositoryThrowsException_ResultsIn500Status()
+        {
+            // arrange
+            InitDefaultMocking();
+            _mockMeterReadingsRepository.Setup(x => x.AddRange(_dummyMeterReadings)).Throws(new Exception());
 
             // act
             var result = await _controller.Upload(_dummyCsvFile);

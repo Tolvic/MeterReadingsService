@@ -12,7 +12,6 @@ namespace MeterReadingsService.UnitTests.Repository
 {
     class MeterReadingsRepositoryTests
     {
-        private InMemoryDbHelper _inMemoryDbHelper;
         private MeterReadingServiceContext _context;
         private MeterReadingsRepository _meterReadingsRepository;
 
@@ -62,7 +61,6 @@ namespace MeterReadingsService.UnitTests.Repository
 
         private void SetUpInMemoryDb()
         {
-            _inMemoryDbHelper = new InMemoryDbHelper();
             var options = new DbContextOptionsBuilder<MeterReadingServiceContext>()
                 .UseInMemoryDatabase(databaseName: "testDb")
                 .Options;

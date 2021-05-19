@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using System.IO.Abstractions;
 using MeterReadingsService.Builders;
 using MeterReadingsService.Data;
+using MeterReadingsService.Repositories;
 using MeterReadingsService.Services;
 using MeterReadingsService.Validator;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,8 @@ namespace MeterReadingsService
             services.AddTransient<IMeterReadingsBuilder, MeterReadingsBuilder>();
             services.AddTransient<IMeterReadingUploadsValidator, MeterReadingUploadsValidator>();
             services.AddTransient<IUploadResultBuilder, UploadResultBuilder>();
+            services.AddTransient<IUploadResultBuilder, UploadResultBuilder>();
+            services.AddTransient<IMeterReadingsRepository, MeterReadingsRepository>();
 
 
         }
