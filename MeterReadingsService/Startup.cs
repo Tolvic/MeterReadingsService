@@ -36,6 +36,7 @@ namespace MeterReadingsService
             services.AddScoped<ICsvParser, CsvParser>();
             services.AddTransient<IMeterReadingsBuilder, MeterReadingsBuilder>();
             services.AddTransient<IMeterReadingUploadsValidator, MeterReadingUploadsValidator>();
+            services.AddTransient<IUploadResultBuilder, UploadResultBuilder>();
 
 
         }
