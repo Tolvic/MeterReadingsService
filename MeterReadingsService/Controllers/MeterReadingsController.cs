@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using MeterReadingsService.Builders;
 using MeterReadingsService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +12,13 @@ namespace MeterReadingsService.Controllers
     {
         private readonly IFileStorageService _fileStorageService;
         private readonly ICsvParser _csvParser;
+        private readonly IMeterReadingsBuilder _meterReadingsBuilder;
 
-        public MeterReadingsController(IFileStorageService fileStorageService, ICsvParser csvParser)
+        public MeterReadingsController(IFileStorageService fileStorageService, ICsvParser csvParser, IMeterReadingsBuilder meterReadingsBuilder)
         {
             _fileStorageService = fileStorageService;
             _csvParser = csvParser;
+            _meterReadingsBuilder = meterReadingsBuilder;
         }
 
         [HttpPost("meter-reading-uploads")]
@@ -31,6 +34,7 @@ namespace MeterReadingsService.Controllers
             try
             {
                 var csvRecords = _csvParser.Parse(tempFilePath);
+                var meterReadings = _meterReadingsBuilder.Build(csvRecords);
             }
             catch
             {
