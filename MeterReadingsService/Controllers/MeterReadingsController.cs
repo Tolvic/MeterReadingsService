@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MeterReadingsService.Builders;
 using MeterReadingsService.Models;
@@ -40,14 +41,14 @@ namespace MeterReadingsService.Controllers
 
             List<dynamic> csvRecords;
             List<MeterReading> meterReadings;
-
+            
             try
             {
                 csvRecords = _csvParser.Parse(tempFilePath);
                 meterReadings = _meterReadingsBuilder.Build(csvRecords);
                 _meterReadingsRepository.AddRange(meterReadings);
             }
-            catch
+            catch(Exception e)
             {
                 return StatusCode(500);
             }

@@ -3,6 +3,8 @@ using System.Dynamic;
 using MeterReadingsService.Validator;
 using NUnit.Framework;
 using FluentAssertions;
+using MeterReadingsService.Repositories;
+using Moq;
 
 namespace MeterReadingsService.UnitTests.Validator
 {
@@ -10,12 +12,15 @@ namespace MeterReadingsService.UnitTests.Validator
     {
         private MeterReadingUploadsValidator _validator;
         private string _date;
+        private Mock<IAccountsRepository> _mockAccountsRepository;
 
         [SetUp]
         public void Setup()
         {
             _date = new DateTime(2021, 05, 19, 16, 42, 00).ToString();
-            _validator = new MeterReadingUploadsValidator();
+            _mockAccountsRepository = new Mock<IAccountsRepository>();
+            _mockAccountsRepository.Setup(x => x.Exists(It.IsAny<int>())).Returns(true);
+            _validator = new MeterReadingUploadsValidator(_mockAccountsRepository.Object);
         }
 
         [Test]

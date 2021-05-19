@@ -1,10 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using MeterReadingsService.Repositories;
 
 namespace MeterReadingsService.Validator
 {
     public class MeterReadingUploadsValidator : IMeterReadingUploadsValidator
     {
+        private IAccountsRepository _AccountsRepository;
+
+        public MeterReadingUploadsValidator(IAccountsRepository accountsRepository)
+        {
+            _AccountsRepository = accountsRepository;
+
+        }
         public bool IsValid(dynamic csvRow)
         {
             var properties =  (IDictionary<string, object>) csvRow;
@@ -35,8 +43,11 @@ namespace MeterReadingsService.Validator
         {
             var accountId = properties["AccountId"].ToString();
 
+            int accountIdInt;
+
             return accountId != null &&
-                   int.TryParse(accountId, out _);
+                   int.TryParse(accountId, out accountIdInt) &&
+                   _AccountsRepository.Exists(accountIdInt);
         }
 
         private bool ValidateMeterReadingDateTime(IDictionary<string, object> properties)

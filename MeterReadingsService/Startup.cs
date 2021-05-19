@@ -45,6 +45,7 @@ namespace MeterReadingsService
             services.AddTransient<IUploadResultBuilder, UploadResultBuilder>();
             services.AddTransient<IUploadResultBuilder, UploadResultBuilder>();
             services.AddTransient<IMeterReadingsRepository, MeterReadingsRepository>();
+            services.AddTransient<IAccountsRepository, AccountsRepository>();
 
 
         }
