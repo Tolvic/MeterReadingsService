@@ -33,6 +33,7 @@ namespace MeterReadingsService
             services.AddTransient<IGuidGenerator, GuidGenerator>();
             services.AddTransient<ICsvReaderBuilder, CsvReaderBuilder>();
             services.AddScoped<ICsvParser, CsvParser>();
+            services.AddTransient<IMeterReadingsBuilder, MeterReadingsBuilder>()
 
 
         }
